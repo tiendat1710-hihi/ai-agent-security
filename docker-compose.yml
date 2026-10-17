@@ -1,0 +1,18 @@
+
+
+services:
+  mailhog-internal:
+    image: mailhog/mailhog:v1.0.1
+    container_name: mailhog-internal
+    ports:
+      - "1025:1025"   # SMTP noi bo
+      - "8025:8025"   # giao dien web + API noi bo
+    restart: unless-stopped
+
+  mailhog-external:
+    image: mailhog/mailhog:v1.0.1
+    container_name: mailhog-external
+    ports:
+      - "1026:1025"   # SMTP ben ngoai (hacker)
+      - "8026:8025"   # giao dien web + API ben ngoai
+    restart: unless-stopped
