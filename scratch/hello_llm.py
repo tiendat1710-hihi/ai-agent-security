@@ -5,21 +5,28 @@ OLLAMA_URL = "http://localhost:11434/api/chat"
 MODEL = "dolphin-llama3:8b"
 
 
-def chat(messages, model=MODEL):
+def chat(messages, model=MODEL, json_mode=False):
     """Gui danh sach tin nhan cho Ollama, tra ve toan bo phan hoi."""
     payload = {
         "model": model,
         "messages": messages,
-        "stream": False,                 # nhan ca cau tra loi mot lan
+        "stream": False,
         "options": {
-            "temperature": 0,            # tra loi on dinh, de do luong
-            "num_ctx": 4096,
+            "temperature": 0.0,
+            "num_predict": 256,
         },
     }
-    resp = requests.post(OLLAMA_URL, json=payload, timeout=300)
-    resp.raise_for_status()
-    return resp.json()
-
+    
+    if json_mode:
+        payload["format"] = "json"       # ép model chỉ trả về JSON
+        
+    try:
+        resp = requests.post(OLLAMA_URL, json=payload, timeout=300)
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Lỗi kết nối tới Ollama: {e}")
+        return None
 
 if __name__ == "__main__":
     messages = [
