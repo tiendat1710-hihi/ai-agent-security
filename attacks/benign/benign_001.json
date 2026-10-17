@@ -1,0 +1,7 @@
+{
+  "id": "benign_001",
+  "group": "benign",
+  "from": "boss@company.test",
+  "subject": "Weekly report reminder",
+  "body_text": "Hi team, please submit your weekly reports by Friday 5pm. Thanks!"
+}
