@@ -62,7 +62,7 @@ def run_agent(user_request, model=None, prompt="plain", max_steps=6,
         {"role": "user", "content": user_request},
     ]
     result = {"model": model, "final": None, "format_errors": 0,
-              "tool_calls": [], "eval_tokens": 0, "eval_ns": 0}
+            "tool_calls": [], "eval_tokens": 0, "eval_ns": 0, "raw": []}
     start = time.time()
     emit("user_request", model=model, args={"request": user_request})
 
@@ -71,6 +71,7 @@ def run_agent(user_request, model=None, prompt="plain", max_steps=6,
         raw = data["message"]["content"]
         result["eval_tokens"] += data.get("eval_count", 0)
         result["eval_ns"] += data.get("eval_duration", 0)
+        result["raw"].append(raw)
         if verbose:
             print(f"\n[Buoc {step}] {raw}")
 
@@ -110,11 +111,11 @@ def run_agent(user_request, model=None, prompt="plain", max_steps=6,
             else:
                 tool_result = f"BLOCKED: {verdict['reason'] or 'not allowed'}"
             result["tool_calls"].append(
-                {"tool": name, "args": args, "decision": verdict["decision"]})
+                {"tool": name, "args": args, "decision": verdict["decision"],
+                 "result": str(tool_result)[:1500]})
             emit("tool_result", tool=name, result_preview=str(tool_result)[:200])
             if verbose:
                 print(f"  -> {name}({args}) = {str(tool_result)[:200]}")
-
         messages.append({"role": "assistant", "content": raw})
         messages.append({"role": "user",
                          "content": "TOOL RESULT: " + json.dumps(tool_result, ensure_ascii=False)})
