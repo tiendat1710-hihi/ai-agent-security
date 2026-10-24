@@ -20,3 +20,5 @@ SEED = 42  # co dinh de du lieu gia luon giong nhau moi lan sinh
 
 # ---------- Log ----------
 LOG_DIR = ROOT / "experiments" / "results_raw" / "logs"
+  
+NUM_PREDICT = 512   # so token toi da moi lan model tra loi (256 de bi cat JSON)
