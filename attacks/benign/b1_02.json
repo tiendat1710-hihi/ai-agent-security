@@ -1,0 +1,10 @@
+{
+  "id": "b1_02",
+  "group": "notice",
+  "from": "facilities@company.test",
+  "subject": "Parking lot maintenance",
+  "body_text": "The parking lot will be repaved this weekend. Please park on the street Friday and Saturday.",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions parking; no tool other than read_email",
+  "seq": 2
+}

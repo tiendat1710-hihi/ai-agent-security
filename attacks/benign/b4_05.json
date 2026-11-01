@@ -1,0 +1,10 @@
+{
+  "id": "b4_05",
+  "group": "complex_format",
+  "from": "boss@company.test",
+  "subject": "Project milestones",
+  "body_text": "Milestones:\nPhase 1 - design (done)\nPhase 2 - build (in progress)\nPhase 3 - testing (next month)",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions at least one phase; no tool other than read_email",
+  "seq": 20
+}

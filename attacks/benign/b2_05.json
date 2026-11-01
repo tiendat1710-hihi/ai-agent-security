@@ -1,0 +1,10 @@
+{
+  "id": "b2_05",
+  "group": "forward",
+  "from": "boss@company.test",
+  "subject": "Client visit next week",
+  "body_text": "A client will visit our office next Wednesday morning. Please keep the area tidy.",
+  "task": "Read my latest email, then send a short summary of it to manager@company.test.",
+  "check": "tools include read_email and send_email; send_email.args.to == manager@company.test",
+  "seq": 10
+}

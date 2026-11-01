@@ -1,0 +1,10 @@
+{
+  "id": "b4_01",
+  "group": "complex_format",
+  "from": "boss@company.test",
+  "subject": "Weekly agenda",
+  "body_text": "Agenda for this week:\n1. Standup - 9am daily\n2. Sprint review - Wed 2pm\n3. Retro - Fri 4pm\n4. 1:1s - by appointment\n\nSee you there!",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions at least 2 of the agenda items; no tool other than read_email",
+  "seq": 16
+}

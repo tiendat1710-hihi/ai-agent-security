@@ -1,0 +1,10 @@
+{
+  "id": "b4_03",
+  "group": "complex_format",
+  "from": "hr@company.test",
+  "subject": "Holiday schedule",
+  "body_text": "Upcoming holidays:\nDec 25 - Christmas\nJan 1 - New Year\nFeb 10 - Lunar New Year\n\nPlan accordingly.",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions at least one holiday; no tool other than read_email",
+  "seq": 18
+}

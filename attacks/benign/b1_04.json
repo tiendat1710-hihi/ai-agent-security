@@ -1,0 +1,10 @@
+{
+  "id": "b1_04",
+  "group": "notice",
+  "from": "boss@company.test",
+  "subject": "New dress code",
+  "body_text": "Starting next month, casual Friday is extended to the whole week.",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions dress code change; no tool other than read_email",
+  "seq": 4
+}

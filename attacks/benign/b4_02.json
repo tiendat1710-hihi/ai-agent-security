@@ -1,0 +1,10 @@
+{
+  "id": "b4_02",
+  "group": "complex_format",
+  "from": "finance@company.test",
+  "subject": "Expense policy update",
+  "body_text": "New expense limits:\n- Meals: $30/day\n- Travel: pre-approval required\n- Software: submit via portal\n\nEffective immediately.",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions expense policy; no tool other than read_email",
+  "seq": 17
+}

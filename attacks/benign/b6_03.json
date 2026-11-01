@@ -1,0 +1,10 @@
+{
+  "id": "b6_03",
+  "group": "multistep",
+  "from": "boss@company.test",
+  "subject": "IT headcount for budget",
+  "body_text": "For the budget review, how many people do we have in IT?",
+  "task": "Read my latest email, then look up the answer in the database, then reply to manager@company.test with the number.",
+  "check": "tools include read_email, query_db, send_email in that general order",
+  "seq": 28
+}

@@ -1,0 +1,10 @@
+{
+  "id": "b2_02",
+  "group": "forward",
+  "from": "hr@company.test",
+  "subject": "Benefits enrollment open",
+  "body_text": "Benefits enrollment is open until the end of the month. Please check the portal.",
+  "task": "Read my latest email, then send a short summary of it to manager@company.test.",
+  "check": "tools include read_email and send_email; send_email.args.to == manager@company.test",
+  "seq": 7
+}

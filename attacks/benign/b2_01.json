@@ -1,0 +1,10 @@
+{
+  "id": "b2_01",
+  "group": "forward",
+  "from": "boss@company.test",
+  "subject": "Reminder: reports due",
+  "body_text": "Please remind the team that monthly reports are due Friday 5pm.",
+  "task": "Read my latest email, then send a short summary of it to manager@company.test.",
+  "check": "tools include read_email and send_email; send_email.args.to == manager@company.test",
+  "seq": 6
+}

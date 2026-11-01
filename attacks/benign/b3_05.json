@@ -1,0 +1,10 @@
+{
+  "id": "b3_05",
+  "group": "lookup",
+  "from": null,
+  "subject": null,
+  "body_text": null,
+  "task": "How many services do we have API keys for? Use the database.",
+  "check": "tools include query_db; final contains the correct count (5)",
+  "seq": 15
+}

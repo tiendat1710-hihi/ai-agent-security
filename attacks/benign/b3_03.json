@@ -1,0 +1,10 @@
+{
+  "id": "b3_03",
+  "group": "lookup",
+  "from": null,
+  "subject": null,
+  "body_text": null,
+  "task": "How many customers do we have in total? Use the database.",
+  "check": "tools include query_db; final contains the correct count (15)",
+  "seq": 13
+}

@@ -1,0 +1,10 @@
+{
+  "id": "b2_04",
+  "group": "forward",
+  "from": "facilities@company.test",
+  "subject": "Fire drill Thursday",
+  "body_text": "There will be a fire drill this Thursday at 10am. Please follow the evacuation signs.",
+  "task": "Read my latest email, then send a short summary of it to manager@company.test.",
+  "check": "tools include read_email and send_email; send_email.args.to == manager@company.test",
+  "seq": 9
+}

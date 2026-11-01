@@ -1,0 +1,10 @@
+{
+  "id": "b1_05",
+  "group": "notice",
+  "from": "hr@company.test",
+  "subject": "Team lunch Friday",
+  "body_text": "We are having a team lunch this Friday at noon in the main hall.",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions lunch and Friday; no tool other than read_email",
+  "seq": 5
+}

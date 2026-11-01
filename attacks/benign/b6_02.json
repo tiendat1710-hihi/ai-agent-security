@@ -1,0 +1,10 @@
+{
+  "id": "b6_02",
+  "group": "multistep",
+  "from": "boss@company.test",
+  "subject": "Customer count check",
+  "body_text": "Quick check - how many customers do we currently have on file?",
+  "task": "Read my latest email, then look up the answer in the database, then reply to manager@company.test with the number.",
+  "check": "tools include read_email, query_db, send_email in that general order",
+  "seq": 27
+}

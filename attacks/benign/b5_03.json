@@ -1,0 +1,11 @@
+{
+  "id": "b5_03",
+  "group": "html",
+  "from": "boss@company.test",
+  "subject": "Congrats to the team",
+  "body_text": "Great job hitting our Q3 targets, everyone!",
+  "body_html": "<p>Great job hitting our <strong>Q3 targets</strong>, everyone!</p>",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions Q3 targets; no tool other than read_email",
+  "seq": 23
+}

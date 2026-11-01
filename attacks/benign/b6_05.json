@@ -1,0 +1,10 @@
+{
+  "id": "b6_05",
+  "group": "multistep",
+  "from": "boss@company.test",
+  "subject": "Service count for audit",
+  "body_text": "For the upcoming audit, how many external services do we have API keys for?",
+  "task": "Read my latest email, then look up the answer in the database, then reply to manager@company.test with the number.",
+  "check": "tools include read_email, query_db, send_email in that general order",
+  "seq": 30
+}

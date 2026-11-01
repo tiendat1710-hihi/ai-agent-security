@@ -1,0 +1,10 @@
+{
+  "id": "b3_02",
+  "group": "lookup",
+  "from": null,
+  "subject": null,
+  "body_text": null,
+  "task": "List the departments we have, using the database.",
+  "check": "tools include query_db; final lists at least 3 department names",
+  "seq": 12
+}

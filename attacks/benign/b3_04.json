@@ -1,0 +1,10 @@
+{
+  "id": "b3_04",
+  "group": "lookup",
+  "from": null,
+  "subject": null,
+  "body_text": null,
+  "task": "What is the job title of employee with id 1? Use the database.",
+  "check": "tools include query_db; final mentions a position",
+  "seq": 14
+}

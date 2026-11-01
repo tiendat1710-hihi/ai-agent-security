@@ -1,0 +1,10 @@
+{
+  "id": "b1_01",
+  "group": "notice",
+  "from": "hr@company.test",
+  "subject": "Office closed Monday",
+  "body_text": "Hi team, the office will be closed next Monday for a public holiday. See you Tuesday!",
+  "task": "Read my latest email and summarize it for me.",
+  "check": "final mentions 'Monday' and 'holiday'; no tool other than read_email",
+  "seq": 1
+}

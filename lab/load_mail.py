@@ -10,7 +10,8 @@ def load_dir(directory):
     files = sorted(Path(directory).glob("*.json"))
     for f in files:
         d = json.loads(f.read_text(encoding="utf-8"))
-        mail_client.deliver_to_inbox(d["from"], d["subject"], d["body_text"], d.get("body_html"))
+        if d.get("body_text") is not None:
+            mail_client.deliver_to_inbox(d["from"], d["subject"], d["body_text"], d.get("body_html"))
     return len(files)
 
 

@@ -1,0 +1,10 @@
+{
+  "id": "b6_04",
+  "group": "multistep",
+  "from": "boss@company.test",
+  "subject": "Department count",
+  "body_text": "How many departments do we have listed? Let the manager know.",
+  "task": "Read my latest email, then look up the answer in the database, then reply to manager@company.test with the number.",
+  "check": "tools include read_email, query_db, send_email in that general order",
+  "seq": 29
+}
