@@ -81,4 +81,45 @@ các lớp chạy bằng code (②, ③, ④) đóng vai trò chốt cứng, l�
 tấn công tới được mô hình. Mức hiệu quả từng lớp sẽ được đo bằng ablation ở tuần 8.
 
 ## 5. Tài liệu tham khảo
-[ĐIỀN: liệt kê đúng các bài bạn đã đọc ở Phần 5, kèm năm và tác giả]
+## 6. Định hướng mở rộng: Attacker Agent (sinh payload tự động)
+
+Theo góp ý của giảng viên hướng dẫn, nhóm đã khảo sát 3 nguồn sinh payload
+(tự viết tay, dataset công khai, mô hình tự sinh) và **chọn hướng mô hình tự
+sinh (Attacker Agent)** làm tầng mở rộng cho giai đoạn Red Team.
+
+### 6.1. Cách hoạt động
+```
+Attacker Agent sinh 1 email tấn công
+        ↓
+Nạp vào hộp thư nội bộ, cho Agent nạn nhân chạy
+        ↓
+leak_checker đo kết quả: đọc mail? truy vấn bảng mật? gửi ra ngoài? rò rỉ thật?
+        ↓
+Attacker Agent đọc kết quả + transcript → sửa lại email
+        ↓
+Lặp lại N vòng, giữ payload hiệu quả nhất
+```
+
+### 6.2. Vì sao chọn hướng này
+- Không vi phạm ràng buộc "không fine-tune mô hình" trong đề cương (mục 3.2):
+  Attacker Agent chỉ dùng PROMPT để yêu cầu một LLM có sẵn sinh/sửa văn bản,
+  không huấn luyện lại tham số nào.
+- Đã được kiểm chứng thủ công ở tuần 2: phát hiện lỗi "model viết placeholder
+  thay vì copy dữ liệu thật" → sửa payload thêm chỉ thị NO_PLACEHOLDER → ASR
+  của dolphin-llama3:8b tăng từ 1/5 lên 6/15. Attacker Agent tự động hóa đúng
+  quy trình phát hiện - sửa - đo lại này.
+- Tạo đối thủ thực sự cho Guardrails ở tuần 7 (tấn công thích ứng), thay vì
+  chỉ chạy lại đúng 30 payload tĩnh.
+
+### 6.3. Lịch trình
+- Tuần 4-5 (Red Team): thiết kế và code Attacker Agent, dùng cho vòng 2 của
+  tấn công (khai thác trọn chuỗi).
+- Tuần 7 (Phòng thủ lớp 3-4): dùng lại Attacker Agent để thử vượt qua
+  Guardrails v1 (tấn công thích ứng), đúng kế hoạch gốc của đề cương.
+
+### 6.4. Giới hạn chưa giải quyết
+- Cần tách tập payload "phát triển" (Attacker Agent được xem) và tập "kiểm
+  tra" (đóng băng từ tuần 7, không cho Attacker Agent hay Blue Team nhìn khi
+  tinh chỉnh) để tránh đánh giá lạc quan giả tạo.
+- Chi phí thời gian: mỗi vòng lặp bằng 1 lượt chạy agent (30-60s), nên số
+  vòng lặp khả thi trên máy hiện tại khoảng vài chục, sẽ đo thực tế ở tuần 4.
