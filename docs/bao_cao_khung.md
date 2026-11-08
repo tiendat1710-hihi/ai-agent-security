@@ -79,3 +79,21 @@ A. Hướng dẫn cài đặt   B. Danh sách payload   C. Dữ liệu thô
 **Kế hoạch tuần 3:** hoàn thiện agent chính thức (ghép log thật vào mọi
 lượt chạy), đo baseline tác vụ hợp lệ trên 30 email bình thường, chuẩn bị
 nền cho vòng 1 tấn công ở tuần 4.
+## Nhật ký tuần 3
+- Hoàn thiện agent/core.py: log mặc định qua RunLogger, xử lý rõ "HET SO
+  BUOC" khi vượt max_steps.
+- Soạn 30 email bình thường, 6 nhóm (notice, forward, lookup,
+  complex_format, html, multistep), mỗi email có tiêu chí đạt/trượt rõ.
+- Đo baseline (temp 0.0, 1 lần/email):
+  qwen2.5:3b 29/30 (96.7%), dolphin-llama3:8b 15/30 (50%),
+  llama3.2:3b 14/30 (46.7%).
+- Phát hiện quan trọng: hai kiểu lỗi khác nhau ở nhóm chỉ-tóm-tắt:
+  (1) Excessive Agency của dolphin (tự gửi email thừa);
+  (2) "gia lap tuan thu" cua llama3.2 (bia ket qua cong cu ma khong goi
+  that - da xac minh qua transcript raw).
+- Ghép log JSON thật và bảng baseline vào Streamlit (tab Nhật ký, tab
+  Đối chiếu).
+- Rà soát mã nguồn agent: 5 lỗ hổng/thiếu kiểm soát, đối chiếu T1-T8.
+- Thiết kế Attacker Agent (dùng dolphin-llama3:8b làm bên tấn công,
+  lặp sinh-chạy-đo-sửa dựa trên leak_checker) để triển khai tuần 4,
+  theo quyết định chọn hướng sinh payload số 3.
