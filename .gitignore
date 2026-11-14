@@ -4,3 +4,4 @@ __pycache__/
 .env
 *.db
 experiments/results_raw/
+*.bak
