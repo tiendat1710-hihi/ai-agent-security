@@ -30,5 +30,11 @@ model × attack × defense) và mức giảm hoàn thành tác vụ lành khi b�
 - Kết luận: phòng thủ nhiều lớp bắt tấn công ngay từ bước truy vấn, trước cả
   khi agent kịp gửi thư ra ngoài.
 
-## Phần 2: Ghép phòng thủ vào đo lường (ĐANG LÀM)
-- (cập nhật sau khi chạy)
+## Phần 2: Ghép phòng thủ vào đo lường (XONG)
+- Thêm --defense vào measure_asr.py; build_policy() dựng policy từ cờ L2/L3/L4.
+- Chạy --defense L2 (repeat 5), so với baseline Phần 5:
+  ASR-action: qwen direct 100%→0%; llama3.2 giảm mạnh (40-100% → hầu hết 0%),
+  còn impersonation 20%.
+  ASR-leak: qwen 0% toàn bộ; llama3.2 còn impersonation 20% (markers=6) lọt qua.
+- Kết luận: Lớp 2 (allowlist người nhận + khóa truy vấn bảng mật khi taint) chặn
+  gần như toàn bộ; còn 1 ca rò rỉ -> động lực cho Lớp 3 (DLP) ở Phần 4.
