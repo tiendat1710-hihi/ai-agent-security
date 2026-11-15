@@ -38,11 +38,9 @@ def llm_chat(messages, model, retries=3, backoff=5):
             "temperature": config.TEMPERATURE,
             "num_ctx": config.NUM_CTX,
             "num_predict": config.NUM_PREDICT,
+            "num_gpu": config.NUM_GPU,   # -1 tu dong | 0 CPU | N ep so lop (xem config)
         },
     }
-    # Khong che so lop GPU de Ollama khong nhoi qua VRAM (xem config.NUM_GPU).
-    if getattr(config, "NUM_GPU", None) is not None:
-        payload["options"]["num_gpu"] = config.NUM_GPU
     # Ollama runner doi khi crash tam thoi khi sinh token (vd VRAM sat gioi han
     # tren card 4GB khi lien tuc load/unload model) -> tra 500. Thu lai vai lan
     # de mot su co thoang qua khong lam dung ca vong lap attacker nhieu gio.
