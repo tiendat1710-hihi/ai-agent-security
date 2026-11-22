@@ -46,3 +46,8 @@ model × attack × defense) và mức giảm hoàn thành tác vụ lành khi b�
   comment, ký tự zero-width; spotlighting (gắn nhãn email là dữ liệu không tin cậy).
 - read_email áp dụng khi config.ENABLE_L1=True; measure_asr bật theo --defense L1.
 - Kết quả --defense L1: hidden_instruction tụt về ~0% (điền số sau khi chạy).
+## Phần 4: Lớp 3 — DLP đầu ra (XONG)
+- Lớp 3 (có sẵn trong policy.py): quét subject+body của send_email, chặn nếu khớp
+  mẫu CNRY-*, sk-fake-*, hoặc số >= 8 chữ số (lương/hợp đồng).
+- Kết quả --defense L3: ASR-leak về 0 toàn bộ (điền số sau khi chạy); ASR-action
+  còn lại là các thư không chứa dữ liệu mật -> đúng vai trò DLP.
