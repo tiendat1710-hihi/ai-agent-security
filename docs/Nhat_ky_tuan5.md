@@ -51,3 +51,10 @@ model × attack × defense) và mức giảm hoàn thành tác vụ lành khi b�
   mẫu CNRY-*, sk-fake-*, hoặc số >= 8 chữ số (lương/hợp đồng).
 - Kết quả --defense L3: ASR-leak về 0 toàn bộ (điền số sau khi chạy); ASR-action
   còn lại là các thư không chứa dữ liệu mật -> đúng vai trò DLP.
+## Phần 5: Lớp 4 — Human-in-the-loop + Audit log (XONG)
+- Lớp 4 (policy.py): hành động gửi-ra-ngoài -> PENDING_APPROVAL (chờ duyệt).
+- audit_summary.py: tổng hợp mọi quyết định Guardrails từ log (ALLOW/BLOCK/PENDING
+  theo lớp + lý do) làm bằng chứng kiểm toán.
+- Giao diện Duyệt/Từ chối tương tác: đưa vào demo Streamlit ở phần hoàn thiện.
+- Kết quả --defense L4 (asr_L4_20261122_1352.csv): ASR-ACTION = 0.0% và
+  ASR-LEAK = 0.0% trên toàn bộ 6 kỹ thuật cho cả qwen2.5:3b và llama3.2:3b.
