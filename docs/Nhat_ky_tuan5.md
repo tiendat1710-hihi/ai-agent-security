@@ -69,3 +69,7 @@ model × attack × defense) và mức giảm hoàn thành tác vụ lành khi b�
   lại 3 lần rồi dừng hẳn; các ca còn lại gửi thư báo cáo cho quản lý nên vẫn qua
   bài kiểm tra sự hiện diện tool). Các tác vụ thông báo, chuyển tiếp nội bộ
   (@company.test) và tra cứu độc lập đạt 100% không bị ảnh hưởng.
+## Phần 7: Ma trận tổng hợp (XONG)
+- build_matrix.py gom asr_*.csv (none/L1/L2/L3/L4/all) -> matrix_asr_action.csv + matrix_asr_leak.csv.
+- Kèm bảng utility none-vs-all. Đây là bảng tổng cuối cho báo cáo Tuần 5.
+- Defense-in-depth (asr_all_20261122_1507.csv): L1 lọc HTML ẩn + spotlighting, L2 chặn truy vấn bảng mật khi taint, L3 (DLP) chặn rò rỉ về 0%, L4 treo chờ duyệt, kết hợp cả 4 lớp (all) đưa ASR-ACTION và ASR-LEAK về 0.0% trên cả 2 model trong khi utility chỉ giảm 1,7% (57/60 -> 56/60).
