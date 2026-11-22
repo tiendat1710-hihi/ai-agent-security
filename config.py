@@ -29,4 +29,6 @@ NUM_PREDICT = 512   # so token toi da moi lan model tra loi (256 de bi cat JSON)
 #   N>0 = ep day dung N lop len GPU (vd 12-15 cho 3B) neu tu dong van bi tran.
 # GPU chay on dinh -> -1 (tu dong). CPU qua cham. Neu lai bi 500/cudaMalloc
 # tren card 4GB thi ha xuong N (vd 12 roi giam dan), hoac 0 de ep CPU.
-NUM_GPU = 12
+NUM_GPU = -1
+#------------lop 1 Guardrails: lam sach noi dung email truoc khi dua vao ngu canh.
+ENABLE_L1 = False   # Lop 1 (loc HTML an + spotlighting) cho read_email

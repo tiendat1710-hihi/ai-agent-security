@@ -38,3 +38,11 @@ model × attack × defense) và mức giảm hoàn thành tác vụ lành khi b�
   ASR-leak: qwen 0% toàn bộ; llama3.2 còn impersonation 20% (markers=6) lọt qua.
 - Kết luận: Lớp 2 (allowlist người nhận + khóa truy vấn bảng mật khi taint) chặn
   gần như toàn bộ; còn 1 ca rò rỉ -> động lực cho Lớp 3 (DLP) ở Phần 4.
+  - Quan sát: model 3B hay viết sai định dạng tool call (đặt tham số ngoài "args"),
+  khiến nhiều lệnh send_email tự fail -> ASR thực tế thấp hơn. Bài học: Guardrails
+  nên chuẩn hóa đầu vào. (Hạn chế, sẽ gia cố ở bước hoàn thiện.)
+  ## Phần 3: Lớp 1 — lọc HTML ẩn + spotlighting (XONG)
+- guardrails/sanitize.py: bỏ phần tử display:none/visibility:hidden, script/style/
+  comment, ký tự zero-width; spotlighting (gắn nhãn email là dữ liệu không tin cậy).
+- read_email áp dụng khi config.ENABLE_L1=True; measure_asr bật theo --defense L1.
+- Kết quả --defense L1: hidden_instruction tụt về ~0% (điền số sau khi chạy).

@@ -21,7 +21,12 @@ def read_email():
     msg = mail_client.latest_message()
     if msg is None:
         return {"error": "inbox is empty"}
-    body = _html_to_text(msg["html"]) if msg["html"] else msg["body"]
+    raw = msg["html"] if msg["html"] else msg["body"]
+    if config.ENABLE_L1:
+        from guardrails.sanitize import sanitize, spotlight
+        body = spotlight(sanitize(raw))
+    else:
+        body = _html_to_text(raw) if msg["html"] else raw
     return {"from": msg["from"], "subject": msg["subject"], "body": body[:MAX_BODY]}
 
 

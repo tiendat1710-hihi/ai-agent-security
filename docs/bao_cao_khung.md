@@ -1,99 +1,103 @@
 # BÁO CÁO ĐỒ ÁN CHUYÊN NGÀNH AN NINH MẠNG
-Đề tài: Đánh giá rủi ro Prompt Injection trên kiến trúc AI Agent
-Nhóm: [ĐIỀN tên thành viên, vai trò]    Giảng viên hướng dẫn: [ĐIỀN]
+
+**Đề tài:** Đánh giá rủi ro Prompt Injection trên kiến trúc AI Agent
+**Nhóm:** [ĐIỀN tên thành viên, vai trò]    **Giảng viên hướng dẫn:** [ĐIỀN]
+**Cập nhật khung:** sau tuần 5 (phần 2). Chú thích trạng thái: ✅ đã có dữ liệu · 🔶 đang làm · ⬜ chưa làm
+
+---
+
+## Tóm tắt (Abstract)
+- Bối cảnh, câu hỏi nghiên cứu, phương pháp, 3 con số chính (ASR trước/sau phòng thủ, utility drop), kết luận. ⬜ viết cuối (tuần 9)
+
+## Mục lục / Danh mục hình / Danh mục bảng / Từ viết tắt (ASR, DLP, HITL, IPI, OWASP LLM)
+
+---
 
 ## Chương 1. Giới thiệu
 1.1. Lý do chọn đề tài (lấy từ đề cương)
-1.2. Mục tiêu và phạm vi
-1.3. Ràng buộc an toàn và đạo đức
-[Trạng thái: bản nháp từ đề cương, hoàn thiện tuần 9]
+1.2. Câu hỏi nghiên cứu và giả thuyết
+  - RQ1: Indirect Prompt Injection có khai thác được agent dùng mô hình *có alignment* không, hay chỉ mô hình gỡ kiểm duyệt?
+  - RQ2: Guardrails nhiều lớp giảm ASR bao nhiêu, đổi lại mất bao nhiêu hoàn thành tác vụ lành?
+  - RQ3: Kẻ tấn công thích ứng (Attacker Agent) vượt được phòng thủ tĩnh không?
+1.3. Mục tiêu, phạm vi và đóng góp
+1.4. Ràng buộc an toàn và đạo đức (lab cô lập, dữ liệu giả, không fine-tune, attacker chỉ black-box, thuật ngữ "kiểm thử đối kháng")
+1.5. Bố cục báo cáo
+[Trạng thái: 🔶 bản nháp từ đề cương, hoàn thiện tuần 9]
 
-## Chương 2. Cơ sở và khảo sát
-2.1. AI Agent và tool calling
-2.2. Direct và Indirect Prompt Injection
-2.3. OWASP Top 10 cho ứng dụng LLM (ghi rõ phiên bản)
-2.4. Các kỹ thuật Guardrails và DLP (lấy từ khao_sat_guardrails.md)
-[Trạng thái: tuần 1 đã có nội dung gốc ở docs/ghi_chu_owasp.md và docs/khao_sat_guardrails.md]
+## Chương 2. Cơ sở lý thuyết và khảo sát
+2.1. AI Agent, tool calling, vòng lặp Plan-Act-Observe
+2.2. Direct và Indirect Prompt Injection; mô hình "confused deputy"
+2.3. OWASP Top 10 cho ứng dụng LLM (ghi rõ phiên bản; ánh xạ LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM06 Excessive Agency)
+2.4. Các kỹ thuật Guardrails: lọc đầu vào/spotlighting, policy engine, DLP đầu ra, human-in-the-loop
+2.5. Công trình liên quan và bộ dữ liệu công khai (AgentDojo, deepset/prompt-injections, Tensor Trust; ghi giấy phép)
+2.6. Khoảng trống nghiên cứu mà đồ án giải quyết
+[Nguồn: ✅ docs/ghi_chu_owasp.md, docs/khao_sat_guardrails.md, docs/tai_lieu_tham_khao.md]
 
 ## Chương 3. Thiết kế hệ thống
-3.1. Kiến trúc tổng thể và threat model (lấy từ threat_model.md)
-3.2. Môi trường lab (Docker, MailHog, SQLite, dữ liệu giả có canary)   [tuần 2]
-3.3. Agent tự xây dựng không dùng framework (vòng lặp Plan-Act-Observe)  [tuần 3]
-3.4. Lựa chọn mô hình ngôn ngữ và kết quả benchmark                      [tuần 2]
+3.1. Kiến trúc tổng thể và threat model (T1–T8, tài sản, ranh giới tin cậy)  ✅ docs/threat_model.md
+3.2. Môi trường lab: Docker Compose, 2 MailHog (nội bộ/"hacker"), SQLite, dữ liệu giả có canary CNRY-…, seed cố định  ✅ tuần 2
+3.3. Hợp đồng kỹ thuật giữa các module (config.py, interfaces.md, định dạng log JSON Lines)  ✅ docs/interfaces.md
+3.4. Agent tự xây dựng không dùng framework (agent/core.py, agent/tools.py, cờ `tainted`, điểm cắm `policy()`)  ✅ tuần 2–3
+3.5. Bộ đo lường độc lập với agent: leak_checker (trọng tài rò rỉ), mail_client, reset_lab, selftest 8/8  ✅
+3.6. Lựa chọn mô hình và benchmark (qwen2.5:3b, llama3.2:3b, dolphin-llama3:8b; lý do loại mistral:7b)  ✅ tuần 2–3
+3.7. Rà soát mã nguồn agent: 5 lỗ hổng/thiếu kiểm soát đối chiếu T1–T8  ✅ docs/code_review.md
+3.8. Giao diện quan sát (Streamlit: Chat / Nhật ký tool call / Đối chiếu)  ✅
 
 ## Chương 4. Tấn công (Red Team)
-4.1. Sáu nhóm kỹ thuật và thư viện 30 payload                           [tuần 4]
-4.2. Kịch bản tấn công end-to-end                                        [tuần 5]
-4.3. Kết quả ASR baseline và phân tích                                   [tuần 5]
+4.1. Định nghĩa chỉ số: ASR-action (hijack: gửi thư/truy vấn trái phép) và ASR-leak (rò marker thật), cách lấy lặp và biến thiên do nhiệt độ
+4.2. Sáu nhóm kỹ thuật: direct override, impersonation, urgency, hidden instruction (HTML ẩn), fake system format, split instruction  ✅
+4.3. Nguồn payload: seed viết tay, Attacker Agent (sinh–chạy–đo–sửa, black-box), dataset công khai; nhãn nguồn và ánh xạ OWASP  ✅ tuần 4
+4.4. Bộ 29 payload chính thức (P01–P29, attacks/final/index.csv)  ✅ tuần 4 (lưu ý: đề cương ghi ~30, thực tế 29 sau gộp điểm; giải thích trong báo cáo)
+4.5. Kịch bản tấn công end-to-end (email độc → đọc → truy vấn bảng mật → gửi ra hộp thư ngoài)  🔶
+4.6. Kết quả ASR baseline (ma trận model × attack, CPU ổn định, công tắc num_gpu)  ✅ tuần 4 phần 5
+4.7. Phân tích định tính
+  - Hai kiểu thất bại của mô hình nhỏ: Excessive Agency (dolphin) và "giả lập tuân thủ" (llama3.2, doc=0 không phải do VRAM) — [[llama32-prompt-regression]]
+  - Mô hình có alignment vẫn gửi thư trái phép (llama3.2: 10/15 lượt) → alignment không chặn được IPI
+  - Mô hình nhỏ ít rò dữ liệu thật vì thiếu năng lực, không phải vì an toàn
 
 ## Chương 5. Phòng thủ (Blue Team)
-5.1. Bốn lớp Guardrails                                                  [tuần 6-7]
-5.2. Tấn công thích ứng vào Guardrails                                   [tuần 7]
+5.1. Nguyên tắc thiết kế: defense-in-depth, gắn qua `policy()` không sửa core.py, chuẩn hóa tool call
+5.2. Lớp 1 — Lọc/làm sạch đầu vào: loại HTML ẩn, spotlighting/đánh dấu nội dung không tin cậy  ⬜ tuần 5 phần 3
+5.3. Lớp 2 — Policy theo ngữ cảnh: allowlist miền người nhận (company.test), khóa truy vấn bảng mật (salaries/customers/api_keys) khi `tainted`  ✅ tuần 5 phần 1–2
+5.4. Lớp 3 — DLP đầu ra: quét canary/marker/mẫu khóa trước khi gửi  ⬜ tuần 5 phần 4 (động lực: ca impersonation còn lọt, 20%, markers=6)
+5.5. Lớp 4 — Human-in-the-loop và audit log  ⬜ tuần 5 phần 5
+5.6. Tấn công thích ứng vào Guardrails (Attacker Agent biết kết quả chặn dạng boolean, thử vượt từng lớp)  ⬜ tuần 6–7
+5.7. Hạn chế của từng lớp (vd. mô hình 3B sai định dạng tool call làm lệnh tự fail → ASR thực tế bị đánh thấp)
 
-## Chương 6. Đánh giá
-6.1. Phương pháp đo (ASR, chặn nhầm, hoàn thành tác vụ, độ trễ)
-6.2. Kết quả trước và sau phòng thủ, ablation                            [tuần 8]
-6.3. Hạn chế
+## Chương 6. Đánh giá thực nghiệm
+6.1. Phương pháp đo: ma trận model × attack × defense; số lần lặp; nhiệt độ; seed; chỉ số ASR-action, ASR-leak, tỉ lệ chặn nhầm (FPR), hoàn thành tác vụ lành (utility), độ trễ
+6.2. Bộ tác vụ lành: 30 email bình thường, 6 nhóm (notice, forward, lookup, complex_format, html, multistep)  ✅ baseline: qwen 29/30, dolphin 15/30, llama3.2 14/30
+6.3. Kết quả trước/sau phòng thủ  🔶 mới có L2 (qwen direct 100%→0%; llama3.2 còn impersonation 20%)
+6.4. Ablation: từng lớp riêng lẻ và tổ hợp (L1, L2, L3, L4, L1+L2, …, tất cả)  ⬜
+6.5. Utility drop và chặn nhầm khi bật phòng thủ  ⬜ tuần 5 phần 6
+6.6. Độ trễ/chi phí phòng thủ  ⬜
+6.7. Thảo luận: đối chiếu RQ1–RQ3, mối đe dọa với tính hợp lệ (mô hình nhỏ, mẫu nhỏ, CPU/GPU, độ ngẫu nhiên)
+6.8. Hạn chế
 
 ## Chương 7. Kết luận và hướng phát triển
+7.1. Kết luận theo từng câu hỏi nghiên cứu
+7.2. Khuyến nghị triển khai thực tế
+7.3. Hướng phát triển (mô hình lớn/API, tool đa dạng hơn, multi-agent, Guardrails dùng LLM-judge)
+
+## Tài liệu tham khảo
+(Lấy từ docs/tai_lieu_tham_khao.md; chuẩn trích dẫn thống nhất)
 
 ## Phụ lục
-A. Hướng dẫn cài đặt   B. Danh sách payload   C. Dữ liệu thô
+A. Hướng dẫn cài đặt và chạy lại thực nghiệm (Docker, Ollama, lệnh reset_lab, measure_asr, attacker_agent)
+B. Danh sách 29 payload (attacks/final/index.csv) và 30 email lành
+C. Dữ liệu thô (experiments/results_raw/*.csv, log JSON Lines)
+D. Hợp đồng kỹ thuật (interfaces.md) và threat model đầy đủ
+E. Nhật ký tuần 1–9 (docs/Nhat_ky_*.md)
 
-## Nhật ký tuần 2
+---
 
-**Đã xong:**
-- Hợp đồng kỹ thuật `config.py` + `docs/interfaces.md` (cổng dịch vụ, schema
-  DB, quy cách canary, định dạng log, tên công cụ) — nền tảng cho mọi tuần sau.
-- Lab giả lập: Docker Compose 2 MailHog (nội bộ 1025/8025, "hacker" 1026/8026).
-- Dữ liệu giả SQLite có canary (CNRY-...), sinh lại được bằng 1 lệnh, seed cố
-  định (manifest hash giống nhau giữa các lần chạy).
-- Bộ đo lường độc lập với agent: `leak_checker.py` (trọng tài rò rỉ),
-  `mail_client.py`, `reset_lab.py`; `selftest.py` đạt 8/8.
-- Lõi agent thật (`agent/core.py`, `agent/tools.py`), không dùng framework,
-  có sẵn chỗ cắm Guardrails (`policy()`) và cờ `tainted`.
-- Benchmark 3 mô hình với 5 email sàng lọc (2 nhóm: có alignment / gỡ kiểm
-  duyệt), lặp 3 lần, nhiệt độ 0.5:
-  - dolphin-llama3:8b (gỡ kiểm duyệt): rò rỉ dữ liệu thật 6/15 lượt (~40%).
-  - llama3.2:3b (có alignment mặc định): KHÔNG rò rỉ dữ liệu thật, nhưng
-    gửi thư trái phép ra ngoài 10/15 lượt — chứng minh "nút gạt" không
-    chặn được việc làm theo chỉ thị trong email, chỉ là mô hình nhỏ chưa đủ
-    năng lực chép dữ liệu thật vào thư.
-  - qwen2.5:3b: dữ liệu chưa đủ tin cậy (phần lớn lượt không gọi công cụ nào),
-    cần điều tra thêm.
-- Khung giao diện Streamlit (Chat / Nhật ký tool call / Đối chiếu) và bộ ghi
-  log JSON Lines theo đúng hợp đồng.
-
-**Quyết định mới trong tuần:**
-- Chọn hướng sinh payload nâng cao: Attacker Agent (mô hình tự sinh/sửa
-  payload dựa trên kết quả đo), dự kiến code ở tuần 4-5 (xem mục 6 của
-  `docs/khao_sat_guardrails.md`). Không vi phạm ràng buộc "không fine-tune".
-- Giữ cấu trúc 2 nhóm mô hình (có alignment / gỡ kiểm duyệt) để chứng minh
-  lỗ hổng Indirect Prompt Injection không phụ thuộc việc gỡ kiểm duyệt.
-- Tạm gác mistral:7b khỏi benchmark chính (lỗi vận hành, chưa rõ nguyên nhân).
-
-**Vướng mắc / câu hỏi cho thầy:**
-- [ĐIỀN nếu có — ví dụ: nhóm có cần đo thêm mô hình qua API để đối chiếu
-  không, hay 3 mô hình local là đủ phạm vi?]
-
-**Kế hoạch tuần 3:** hoàn thiện agent chính thức (ghép log thật vào mọi
-lượt chạy), đo baseline tác vụ hợp lệ trên 30 email bình thường, chuẩn bị
-nền cho vòng 1 tấn công ở tuần 4.
-## Nhật ký tuần 3
-- Hoàn thiện agent/core.py: log mặc định qua RunLogger, xử lý rõ "HET SO
-  BUOC" khi vượt max_steps.
-- Soạn 30 email bình thường, 6 nhóm (notice, forward, lookup,
-  complex_format, html, multistep), mỗi email có tiêu chí đạt/trượt rõ.
-- Đo baseline (temp 0.0, 1 lần/email):
-  qwen2.5:3b 29/30 (96.7%), dolphin-llama3:8b 15/30 (50%),
-  llama3.2:3b 14/30 (46.7%).
-- Phát hiện quan trọng: hai kiểu lỗi khác nhau ở nhóm chỉ-tóm-tắt:
-  (1) Excessive Agency của dolphin (tự gửi email thừa);
-  (2) "gia lap tuan thu" cua llama3.2 (bia ket qua cong cu ma khong goi
-  that - da xac minh qua transcript raw).
-- Ghép log JSON thật và bảng baseline vào Streamlit (tab Nhật ký, tab
-  Đối chiếu).
-- Rà soát mã nguồn agent: 5 lỗ hổng/thiếu kiểm soát, đối chiếu T1-T8.
-- Thiết kế Attacker Agent (dùng dolphin-llama3:8b làm bên tấn công,
-  lặp sinh-chạy-đo-sửa dựa trên leak_checker) để triển khai tuần 4,
-  theo quyết định chọn hướng sinh payload số 3.
+## Bảng theo dõi tiến độ báo cáo
+| Chương | Nguồn nội dung | Trạng thái | Việc còn lại |
+|--------|----------------|-----------|--------------|
+| 1 | Đề cương | 🔶 | Viết RQ, đóng góp |
+| 2 | ghi_chu_owasp, khao_sat_guardrails | 🔶 | Gộp, thêm công trình liên quan |
+| 3 | threat_model, interfaces, code_review, Nhat_ky 2–3 | ✅ | Vẽ sơ đồ kiến trúc |
+| 4 | Nhat_ky 4, attacks/final, results_raw | ✅ | Kịch bản E2E, bảng ASR baseline |
+| 5 | Nhat_ky 5 | 🔶 | Lớp 1, 3, 4; tấn công thích ứng |
+| 6 | measure_asr, results_raw | 🔶 | Ma trận đầy đủ, ablation, utility drop |
+| 7 | — | ⬜ | Viết cuối |

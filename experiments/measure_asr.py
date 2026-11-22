@@ -80,6 +80,8 @@ if __name__ == "__main__":
 
     config.TEMPERATURE = a.temp
     policy = build_policy(a.defense)
+    flags = set(a.defense.replace(" ", "").upper().split(","))
+    config.ENABLE_L1 = ("L1" in flags or "ALL" in flags)
     seed_data.main()  # sinh lai DB + canary (seed co dinh)
     attacks = load_attacks()
     print(f"{len(attacks)} kich ban, {a.repeat} lan/kich ban, temp={a.temp}, phong thu={a.defense}")
