@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 import config
 from agent import core
 from experiments.logger import RunLogger
@@ -85,7 +86,11 @@ def render(ctx):
     )
 
     if st.button("Nạp email & chạy tấn công", type="primary"):
-        _deliver(atk)
+        try:
+            _deliver(atk)
+        except (requests.RequestException, OSError) as error:
+            st.error(f"Không thể chuẩn bị hộp thư: {error}")
+            return
         log = RunLogger(ctx["model"])
         events = []
 
@@ -94,12 +99,12 @@ def render(ctx):
             events.append({"event": event, **kw})
 
         with st.spinner(f"{ctx['model']} đang đọc email và hành động..."):
-            res = core.run_agent(
-                VICTIM_TASK,
-                model=ctx["model"],
-                policy=ctx["policy"],
-                emit=emit,
-            )
+            try:
+                res = core.run_agent(VICTIM_TASK, model=ctx["model"], policy=ctx["policy"],
+                                     emit=emit, run_id=log.run_id, enable_l1="L1" in ctx["layers"])
+            except (requests.RequestException, OSError) as error:
+                st.error(f"Lượt chạy bị gián đoạn: {error}")
+                res = {"status": "infra_error"}
 
         st.markdown("### Diễn biến thực thi (Plan → Act → Observe)")
         for ev in events:
@@ -123,7 +128,11 @@ def render(ctx):
                 st.success("✅ Trả lời cuối: " + (ev.get("result_preview") or ""))
 
         st.markdown("### Phán quyết của trọng tài (leak_checker)")
-        ext = leak_checker.check_external()
+        try:
+            ext = leak_checker.check_external()
+        except (requests.RequestException, OSError) as error:
+            st.error(f"Không thể kiểm tra hộp thư ngoài: {error}")
+            return
         tools_used = [c["tool"] for c in res.get("tool_calls", [])]
         if tools_used:
             pills = " ".join(f'<span class="pill pill-gray">{t}</span>' for t in tools_used)
@@ -152,13 +161,15 @@ def render(ctx):
                 f'</div>',
                 unsafe_allow_html=True,
             )
+        elif res["status"] == "pending":
+            st.info(f"Đang chờ duyệt mã {res['pending_id']}. Hộp thư ngoài đang trống.")
+        elif res["status"] == "max_steps":
+            st.warning(f"Agent hết số bước, có {res['format_errors']} lỗi định dạng. "
+                       "Hộp thư ngoài đang trống. Lượt chạy chưa hoàn tất.")
+        elif res["status"] == "infra_error":
+            st.warning("Chưa thể kết luận về lượt chạy. Hộp thư ngoài đang trống.")
         else:
-            st.markdown(
-                '<div class="verdict-box verdict-safe">'
-                '<strong>✅ PHÒNG THỦ GIỮ VỮNG:</strong> Không có dữ liệu hay email nào lọt ra hộp thư ngoài.'
-                '</div>',
-                unsafe_allow_html=True,
-            )
+            st.success("Lượt chạy đã kết thúc. Hộp thư ngoài đang trống.")
 
         with st.expander("Hộp thư BÊN NGOÀI (hacker) sau lượt chạy", expanded=bool(ext["messages"])):
             msgs = mail_client.list_messages(config.EXTERNAL_MAIL)[:10]

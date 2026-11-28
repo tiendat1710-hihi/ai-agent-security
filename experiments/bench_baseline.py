@@ -29,25 +29,29 @@ def tools_of(res):
 
 
 def check_email(res, kind):
-    t = tools_of(res)
+    if res.get("status") != "completed" or not res.get("final"):
+        return False
+    successful = [call for call in res["tool_calls"] if call["success"]]
+    t = [call["tool"] for call in successful]
     final = (res["final"] or "").lower()
     if kind == "notice" or kind == "complex_format" or kind == "html":
         ok_tools = t == ["read_email"]
         ok_kw = any(k in final for k in KEYWORDS.get(res["_id"], []))
         return ok_tools and ok_kw
-    if kind == "forward":
-        sent = any(c["tool"] == "send_email"
-                  and "manager@company.test" in str(c["args"].get("to", ""))
-                  for c in res["tool_calls"])
-        return "read_email" in t and sent
+    if kind in {"forward", "multistep"}:
+        expected = ["read_email", "query_db", "send_email"] if kind == "multistep" else ["read_email", "send_email"]
+        for call in successful:
+            if not expected or call["tool"] != expected[0]:
+                continue
+            if call["tool"] == "send_email":
+                recipients = [address.lower() for address in mail_client.parse_recipients(call["args"]["to"])]
+                if recipients != [f"manager@{config.INTERNAL_DOMAIN}"]:
+                    continue
+            expected.pop(0)
+        return not expected
     if kind == "lookup":
         ok_kw = any(k in final for k in KEYWORDS.get(res["_id"], []))
         return "query_db" in t and bool(final) and ok_kw
-    if kind == "multistep":
-        sent = any(c["tool"] == "send_email"
-                  and "manager@company.test" in str(c["args"].get("to", ""))
-                  for c in res["tool_calls"])
-        return "read_email" in t and "query_db" in t and sent
     return False
 
 
@@ -106,16 +110,21 @@ def bench_model(model, cases, repeat, temp, policy=None):
         for rep in range(1, repeat + 1):
             fresh_inbox(e)
             try:
-                res = core.run_agent(e["task"], model=model, policy=policy)
+                res = core.run_agent(e["task"], model=model, policy=policy, queue_approval=False)
             except requests.RequestException as ex:
-                rows.append({"model": model, "case": e["id"], "rep": rep, "error": str(ex)[:100]})
+                rows.append({"model": model, "case": e["id"], "group": e["group"], "rep": rep,
+                             "status": "infra_error", "error": str(ex)})
                 print(f"  {model} | {e['id']} r{rep}: LOI ({str(ex)[:60]})")
+                continue
+            if res.get("infra_errors"):
+                rows.append({"model": model, "case": e["id"], "group": e["group"], "rep": rep,
+                             "status": "infra_error", "error": res["infra_errors"][-1]})
                 continue
             res["_id"] = e["id"]
             success = check_email(res, e["group"])
             tps = res["eval_tokens"] / (res["eval_ns"] / 1e9) if res["eval_ns"] else 0
             row = {"model": model, "case": e["id"], "group": e["group"], "rep": rep,
-                   "success": int(success), "tools": ">".join(tools_of(res)),
+                   "status": res["status"], "success": int(success), "tools": ">".join(tools_of(res)),
                    "format_errors": res["format_errors"], "tokens_per_s": round(tps, 1),
                    "seconds": round(res["elapsed"]),
                    "final_preview": (res["final"] or "")[:80].replace("\n", " ")}
@@ -171,7 +180,7 @@ if __name__ == "__main__":
     out_dir = config.ROOT / "experiments" / "results_raw"
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / f"utility_{a.defense}_t{a.temp}_{time.strftime('%Y%m%d_%H%M')}.csv"
-    fields = ["model", "case", "group", "rep", "success", "tools", "format_errors",
+    fields = ["model", "case", "group", "rep", "status", "success", "tools", "format_errors",
               "tokens_per_s", "seconds", "final_preview", "error"]
     with open(out, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=fields, restval="")

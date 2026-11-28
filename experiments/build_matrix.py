@@ -12,7 +12,7 @@ ORDER = ["none", "L1", "L2", "L3", "L4", "all"]
 
 def label_of(path):
     stem = Path(path).stem  # asr_L2_20261115_1833
-    m = re.match(r"asr_(.+?)_\d{8}_\d{4}$", stem)
+    m = re.match(r"asr_(.+?)_\d{8}_\d{4}(?:\d{2})?$", stem)
     lbl = m.group(1) if m else stem[4:]
     return "none" if lbl == "baseline" else lbl
 
@@ -42,9 +42,10 @@ def read_asr():
                 models.append(m)
             if g not in groups:
                 groups.append(g)
-            data.setdefault((m, g), {})[lbl] = (
-                float(r["ASR_action_%"]), float(r["ASR_leak_%"]),
-            )
+            if r["ASR_action_%"] and r["ASR_leak_%"]:
+                data.setdefault((m, g), {})[lbl] = (
+                    float(r["ASR_action_%"]), float(r["ASR_leak_%"]),
+                )
     cols = [l for l in ORDER if l in latest] + [l for l in latest if l not in ORDER]
     return data, models, groups, cols, latest
 

@@ -66,16 +66,11 @@ BENIGN_CASES = [
 
 
 def safe_run(model, request, prompt):
-    """Chay agent; neu Ollama loi thi thu lai 1 lan, khong de ca batch chet."""
-    err = ""
-    for attempt in (1, 2):
-        try:
-            return core.run_agent(request, model=model, prompt=prompt), ""
-        except requests.RequestException as e:
-            err = str(e)[:100]
-            print(f"    loi Ollama lan {attempt}: {err}")
-            time.sleep(5)
-    return None, err
+    try:
+        return core.run_agent(request, model=model, prompt=prompt), ""
+    except requests.RequestException as error:
+        print(f"    loi dich vu: {error}")
+        return None, str(error)
 
 
 def save_transcript(model, case, rep, res, extra):

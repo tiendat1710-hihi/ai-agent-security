@@ -10,3 +10,8 @@
 - Hiển thị từng bước Plan -> Act -> Observe, nêu rõ lớp nào CHẶN / TREO DUYỆT.
 - Trọng tài leak_checker phán: RÒ RỈ THẬT / có thư ra ngoài / an toàn.
 - Demo đủ 4 hành vi: none rò rỉ -> L2 chặn query -> L1 lọc HTML ẩn -> L4 treo duyệt.
+## Phần 3: Hàng đợi duyệt HITL — Lớp 4 (XONG)
+- core.py: thêm nhánh PENDING_APPROVAL -> đẩy hành động vào hàng đợi (không tự gửi).
+- guardrails/hitl_queue.py: enqueue/list/resolve, lưu JSONL; duyệt thì gọi tools.send_email thật.
+- ui/page_hitl.py: hiện thư treo + nút Duyệt/Từ chối, cảnh báo người nhận ngoài miền.
+- Demo: Từ chối -> chặn; Duyệt -> gửi thật -> rò rỉ -> con người là chốt chặn cuối.

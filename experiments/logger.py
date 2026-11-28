@@ -19,6 +19,7 @@ class RunLogger:
     def emit(self, event, tool=None, args=None, result_preview=None,
              decision=None, layer=None, reason=None, **kwargs):
         row = {
+            **kwargs,
             "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "run_id": self.run_id,
             "model": self.model,

@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 import config
 from agent import core
 from experiments.logger import RunLogger
@@ -83,16 +84,19 @@ def render(ctx):
         log = RunLogger(ctx["model"])
         active = ", ".join(sorted(ctx["layers"])) or "none"
         with st.spinner(f"{ctx['model']} đang xử lý (phòng thủ: {active})..."):
-            res = core.run_agent(
-                prompt,
-                model=ctx["model"],
-                policy=ctx["policy"],
-                emit=log.emit,
-            )
+            try:
+                res = core.run_agent(prompt, model=ctx["model"], policy=ctx["policy"],
+                                     emit=log.emit, run_id=log.run_id, enable_l1="L1" in ctx["layers"])
+            except (requests.RequestException, OSError) as error:
+                st.error(f"Lượt chạy bị gián đoạn: {error}")
+                return
 
-        answer = res["final"] or "(không có câu trả lời / hết bước / bị treo duyệt)"
+        if res["status"] == "pending":
+            answer = f"Đang chờ duyệt yêu cầu {res['pending_id']} trong tab Hàng đợi duyệt."
+        else:
+            answer = res["final"] or "Agent hết số bước trước khi đưa ra câu trả lời."
         tools_used = [c["tool"] for c in res.get("tool_calls", [])]
-        ext = leak_checker.check_external()
+        ext = leak_checker.check_external() if res["status"] == "completed" else None
 
         st.session_state.last_run_id = log.run_id
         st.session_state.home_chat.append({
@@ -107,7 +111,8 @@ def render(ctx):
             if tools_used:
                 pills = " ".join(f'<span class="pill pill-gray">{t}</span>' for t in tools_used)
                 st.markdown(f'<div class="pill-group" style="margin-top:6px;">{pills}</div>', unsafe_allow_html=True)
-            _render_verdict(ext)
+            if ext is not None:
+                _render_verdict(ext)
 
     with st.expander("Kiểm tra nhanh 2 hộp thư MailHog (Nội bộ vs Bên ngoài)", expanded=False):
         c1, c2 = st.columns(2)

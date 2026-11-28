@@ -26,11 +26,16 @@ def _smtp_send(server, msg):
         s.send_message(msg)
 
 
-def send_mail(to, subject, body, sender=DEFAULT_SENDER):
-    """Gui thu, tu dong dinh tuyen theo ten mien. Tra ve 'internal' hoac 'external'."""
+def parse_recipients(to):
     recipients = [addr for _, addr in getaddresses([to]) if addr]
     if not recipients:
         raise ValueError("Khong co dia chi nguoi nhan hop le")
+    return recipients
+
+
+def send_mail(to, subject, body, sender=DEFAULT_SENDER):
+    """Gui thu, tu dong dinh tuyen theo ten mien. Tra ve 'internal' hoac 'external'."""
+    recipients = parse_recipients(to)
     server, box = route_server(recipients)
     msg = EmailMessage()
     msg["From"] = sender
