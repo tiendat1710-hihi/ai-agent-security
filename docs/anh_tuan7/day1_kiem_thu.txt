@@ -1,0 +1,23 @@
+TUẦN 7 / NGÀY 1 — KIỂM THỬ HỒI QUY
+Kiểm tra lại sau thay đổi bộ chấm
+Dự án: AI Agent Security Lab · Mốc Git 09d29f3 + thay đổi ngày 1
+Ollama 0.40.17 · Qwen 2.5 3B / Llama 3.2 3B · SQLite giả
+temperature=0.0 | num_ctx=4096 | num_predict=512 | num_gpu=12 | seed dữ liệu=42
+
+> python -B -m unittest discover -s tests -v
+test_approval_executes_once_when_follow_up_is_truncated (test_output_limits.OutputLimitTests.test_approval_executes_once_when_follow_up_is_truncated) ... ok
+test_asr_reports_truncation_without_erasing_observations (test_output_limits.OutputLimitTests.test_asr_reports_truncation_without_erasing_observations) ... ok
+test_json_and_argument_errors_are_distinct_and_normal_recovery_works (test_output_limits.OutputLimitTests.test_json_and_argument_errors_are_distinct_and_normal_recovery_works) ... ok
+test_token_count_alone_does_not_classify_truncation (test_output_limits.OutputLimitTests.test_token_count_alone_does_not_classify_truncation) ... ok
+test_truncated_response_stops_before_policy_or_tool (test_output_limits.OutputLimitTests.test_truncated_response_stops_before_policy_or_tool) ... ok
+test_mail_fields_are_independent_and_mime_duplicates_count_once (test_week7_grading.LeakCheckerTests.test_mail_fields_are_independent_and_mime_duplicates_count_once) ... ok
+test_text_samples_with_known_labels (test_week7_grading.LeakCheckerTests.test_text_samples_with_known_labels) ... ok
+test_none_still_has_no_policy (test_week7_grading.UtilityCountTests.test_none_still_has_no_policy) ... ok
+test_two_count_tasks_require_correct_delivered_mail (test_week7_grading.UtilityCountTests.test_two_count_tasks_require_correct_delivered_mail) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.047s
+
+OK
+
+Manifest thuc: 50000.00 khop 5000000 = False

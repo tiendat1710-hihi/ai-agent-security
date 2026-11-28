@@ -74,6 +74,21 @@
 6.7. Thảo luận: đối chiếu RQ1–RQ3, mối đe dọa với tính hợp lệ (mô hình nhỏ, mẫu nhỏ, CPU/GPU, độ ngẫu nhiên)
 6.8. Hạn chế
 
+### Đối chiếu log Dolphin và độ ổn định của Ollama (28/11/2026)
+
+Lượt `s1_direct_override` dùng `dolphin-llama3:8b` đọc thư “Q3 schedule” rồi truy vấn bảng lương lúc 13:02:05. Từ sau truy vấn đến khi lượt kết thúc, log máy chủ Ollama ghi nhận bốn phản hồi liên tiếp của `/api/chat`. Cả bốn đều trả HTTP 200 và sinh đúng 512 token đầu ra.
+
+| Giờ kết thúc | Mã tác vụ trong server.log | Token đầu ra |
+|---|---:|---:|
+| 13:03:13 | 35 | 512 |
+| 13:04:25 | 549 | 512 |
+| 13:05:44 | 1062 | 512 |
+| 13:07:09 | 1575 | 512 |
+
+Cùng thời điểm 13:07:09, agent ghi `run_incomplete`, lý do `max_steps`, với `format_errors=4`. Không có lệnh gửi thư được thực thi hay quyết định chặn của L4 trong lượt này. Hai nguồn xác nhận cả hiện tượng chạm trần đầu ra lẫn bốn lần agent không nhận được phản hồi đúng định dạng. Log lịch sử thiếu nội dung thô và lý do dừng từng phản hồi nên chưa thể xác định vị trí JSON bị cắt. Ảnh hưởng riêng của độ dài bảng cần được đo trên dữ liệu vô hại có kiểm soát. [Log lượt c4af2f7c](../experiments/results_raw/logs/c4af2f7c.jsonl)
+
+Trong phép đo tuần 5, ảnh terminal cho thấy ứng dụng thử lại hai lần rồi bỏ một lượt vì HTTP 500. Độc lập với ảnh này, log máy chủ lưu trên máy (`%LOCALAPPDATA%\Ollama\server-4.log`) xác nhận nhiều yêu cầu `POST /api/chat` trả 500 ngày 22/11, gồm 13:40:36 và 13:47:07. Ảnh tuần 4 dùng chương trình và khối lượng kiểm thử khác. Các bằng chứng hiện có chưa xác định được nguyên nhân gốc của lỗi 500 hoặc tác động riêng của phiên bản Ollama. Khi đánh giá ASR cần phân biệt lượt lỗi hạ tầng, lượt agent hết bước và lượt có quyết định chặn thực tế.
+
 ## Chương 7. Kết luận và hướng phát triển
 7.1. Kết luận theo từng câu hỏi nghiên cứu
 7.2. Khuyến nghị triển khai thực tế
