@@ -36,14 +36,29 @@ def read_email():
 
 def query_db(sql):
     # Mo che do CHI DOC la bien phap an toan cho lab (khong cho model xoa du lieu).
-    # Day KHONG phai phong thu du lieu mat: baseline van doc duoc moi cot.
     uri = config.DB_PATH.resolve().as_uri() + "?mode=ro"
     try:
+        from guardrails.policy import analyze_sql
+        info = analyze_sql(sql)
+        tables = sorted(info["tables"])
+
         con = sqlite3.connect(uri, uri=True)
         con.row_factory = sqlite3.Row
-        rows = con.execute(sql).fetchmany(MAX_ROWS)
+        rows = [dict(r) for r in con.execute(sql).fetchmany(MAX_ROWS)]
         con.close()
-        return [dict(r) for r in rows]
+
+        # Phong thu Second-Order Injection: du lieu tu bang customers (do nguoi ngoai nhap)
+        # cung duoc lam sach va gan nhan ranh gioi khi L1 bat.
+        if config.ENABLE_L1 and "customers" in info["tables"]:
+            from guardrails.sanitize import sanitize, spotlight
+            for r in rows:
+                for k, v in list(r.items()):
+                    if isinstance(v, str) and len(v) > 15 and "@" not in v:
+                        r[k] = spotlight(sanitize(v))
+
+        if tables:
+            return {"rows": rows, "_tables": tables}
+        return rows
     except Exception as e:
         return {"error": str(e)}
 
@@ -60,8 +75,6 @@ TOOLS = {"read_email": read_email, "query_db": query_db, "send_email": send_emai
 
 
 # ------------------------------------------------------- chuan hoa tham so
-# Chay TAT DINH truoc policy: policy, checkpoint HITL va tool thuc thi cung nhin
-# thay MOT bo tham so da chuan hoa (nguoi duyet thay dung cai se chay).
 TOOL_PARAMS = {
     "read_email": {"required": (), "optional": ()},
     "query_db": {"required": ("sql",), "optional": ()},
@@ -83,12 +96,6 @@ class ToolArgsError(ValueError):
 
 
 def normalize_tool_args(tool_name, args):
-    """Tra ve (args_chuan, ghi_chu). Nem ToolArgsError neu khong chuan hoa duoc.
-    1. args la chuoi JSON -> parse.  2. mo boc {"args": {...}} long nhau (<= 3 lop).
-    3. khoa: strip + lower, anh xa alias -> ten chuan.  4. alias va ten chuan cung
-    co mat ma khac gia tri -> tu choi (mo ho).  5. tham so la -> tu choi.
-    6. thieu tham so bat buoc -> tu choi.  7. 'to' dang list -> 'a, b'; gia tri
-    phai la chuoi (so -> chuoi), dict/list long -> tu choi."""
     if tool_name not in TOOL_PARAMS:
         raise ToolArgsError(f"unknown tool {tool_name!r}")
     notes = []
