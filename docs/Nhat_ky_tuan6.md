@@ -24,3 +24,8 @@
 ## Phần 4: Nhật ký kiểm toán — XONG
 - 823 sự kiện, 89 chặn (L2 87, L3 2), 34 treo, 1 duyệt, 1 từ chối; khớp audit_summary CLI.
 - Lọc theo lớp, truy vết theo run_id (761f38f8: L2 chặn query_db và send_email).
+
+## Phần 5: Bảng kết quả — XONG
+- Heatmap ASR-action/leak theo kỹ thuật × cấu hình, khớp matrix_asr_*.csv của tuần 5.
+- Utility: none 95,0% (57/60) -> all 93,3% (56/60), giảm 1,7 điểm %.
+- Ảnh minh chứng: docs/anh_tuan6/ (P3_*, P4_*, P5_*).
