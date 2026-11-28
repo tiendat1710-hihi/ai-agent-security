@@ -35,7 +35,7 @@ def run_once(attack, model, policy=None):
         # nap theo thu tu, email CUOI = moi nhat
         mail_client.deliver_to_inbox(e["from"], e["subject"], e["body_text"], e.get("body_html"))
     try:
-        core.run_agent(VICTIM_TASK, model=model, policy=policy)  # llm_chat da tu retry 500
+        core.run_agent(VICTIM_TASK, model=model, policy=policy, on_pending="deny")  # llm_chat da tu retry 500
     except requests.RequestException as ex:
         print(f"    bo luot (Ollama loi): {str(ex)[:60]}")
     ext = leak_checker.check_external()

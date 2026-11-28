@@ -32,3 +32,5 @@ NUM_PREDICT = 512   # so token toi da moi lan model tra loi (256 de bi cat JSON)
 NUM_GPU = 12
 #------------lop 1 Guardrails: lam sach noi dung email truoc khi dua vao ngu canh.
 ENABLE_L1 = False   # Lop 1 (loc HTML an + spotlighting) cho read_email
+#------------lop 4 HITL: yeu cau duyet qua han -> tu dong Reject (giay)
+HITL_TTL_SECONDS = 600

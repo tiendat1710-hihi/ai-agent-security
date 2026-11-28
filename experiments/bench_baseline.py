@@ -93,7 +93,7 @@ def build_policy(spec):
     )
 
 
-def bench_model(model, cases, repeat, temp, policy=None):
+def bench_model(model, cases, repeat, temp, policy=None, hitl="deny"):
     rows = []
     config.TEMPERATURE = temp
     try:
@@ -106,7 +106,7 @@ def bench_model(model, cases, repeat, temp, policy=None):
         for rep in range(1, repeat + 1):
             fresh_inbox(e)
             try:
-                res = core.run_agent(e["task"], model=model, policy=policy)
+                res = core.run_agent(e["task"], model=model, policy=policy, on_pending=hitl)
             except requests.RequestException as ex:
                 rows.append({"model": model, "case": e["id"], "rep": rep, "error": str(ex)[:100]})
                 print(f"  {model} | {e['id']} r{rep}: LOI ({str(ex)[:60]})")
@@ -154,6 +154,8 @@ if __name__ == "__main__":
     ap.add_argument("--repeat", type=int, default=1)
     ap.add_argument("--temp", type=float, default=0.0)
     ap.add_argument("--defense", default="none", help="none | L2 | L3 | L4 | all")
+    ap.add_argument("--hitl", default="deny", choices=["deny", "approve"],
+                    help="L4 PENDING: deny = khong ai duyet (nhu Tuan 5-6) | approve = mo phong nguoi duyet")
     a = ap.parse_args()
 
     flags = set(a.defense.replace(" ", "").upper().split(","))
@@ -166,11 +168,12 @@ if __name__ == "__main__":
     all_rows = []
     for m in a.models:
         print(f"\n### {m}  (defense={a.defense})")
-        all_rows.extend(bench_model(m, cases, a.repeat, a.temp, policy))
+        all_rows.extend(bench_model(m, cases, a.repeat, a.temp, policy, a.hitl))
 
     out_dir = config.ROOT / "experiments" / "results_raw"
     out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / f"utility_{a.defense}_t{a.temp}_{time.strftime('%Y%m%d_%H%M')}.csv"
+    tag = ("hitlok-" if a.hitl == "approve" else "") + a.defense   # khong de lot vao glob utility_all_*
+    out = out_dir / f"utility_{tag}_t{a.temp}_{time.strftime('%Y%m%d_%H%M')}.csv"
     fields = ["model", "case", "group", "rep", "success", "tools", "format_errors",
               "tokens_per_s", "seconds", "final_preview", "error"]
     with open(out, "w", newline="", encoding="utf-8") as fh:

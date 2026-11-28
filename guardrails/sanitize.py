@@ -9,11 +9,18 @@ import unicodedata
 ZERO_WIDTH = re.compile(r"[\u200b\u200c\u200d\u2060\ufeff]")
 
 
+HIDDEN = re.compile(
+    r"(?is)<([a-z0-9]+)[^>]*style\s*=\s*[\"'][^\"']*"
+    r"(?:display\s*:\s*none|visibility\s*:\s*hidden)[^\"']*[\"'][^>]*>.*?</\1>")
+
+
 def _strip_hidden(markup):
-    return re.sub(
-        r"(?is)<([a-z0-9]+)[^>]*style\s*=\s*[\"'][^\"']*"
-        r"(?:display\s*:\s*none|visibility\s*:\s*hidden)[^\"']*[\"'][^>]*>.*?</\1>",
-        " ", markup)
+    return HIDDEN.sub(" ", markup)
+
+
+def count_hidden(markup):
+    """So phan tu an Lop 1 se xoa (ghi vao nhat ky kiem toan)."""
+    return len(HIDDEN.findall(markup or ""))
 
 
 def sanitize(markup):

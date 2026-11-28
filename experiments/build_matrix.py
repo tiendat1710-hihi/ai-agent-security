@@ -63,6 +63,64 @@ def completion(path):
     return out
 
 
+# ----------------------------------------------- doc lai cho ui/page_results.py
+def utility_label(path):
+    """utility_all_t0.0_20261122_1436.csv -> 'all'; utility_hitlok-all_t0.0_... -> 'hitlok-all'."""
+    m = re.match(r"utility_(.+?)_t[\d.]+_\d{8}_\d{4}$", Path(path).stem)
+    return m.group(1) if m else None
+
+
+def newest_utility_per_label(raw=None):
+    latest = {}
+    for f in glob.glob(str(Path(raw or RAW) / "utility_*.csv")):
+        lbl = utility_label(f)
+        if lbl and (lbl not in latest or os.path.getmtime(f) > os.path.getmtime(latest[lbl])):
+            latest[lbl] = f
+    return latest
+
+
+def utility_rows(raw=None):
+    """[{config, model, done, total, rate, failed_cases, file}] - moi cau hinh lay file moi nhat."""
+    out = []
+    latest = newest_utility_per_label(raw)
+    for lbl in sorted(latest, key=lambda l: (ORDER.index(l) if l in ORDER else len(ORDER), l)):
+        per_model, failed = {}, {}
+        for r in csv.DictReader(open(latest[lbl], encoding="utf-8")):
+            if r.get("error"):
+                continue
+            m = r["model"]
+            c = per_model.setdefault(m, [0, 0])
+            ok = int(r.get("success") or 0)
+            c[0] += ok
+            c[1] += 1
+            if not ok:
+                failed.setdefault(m, []).append(r.get("case"))
+        for m, (done, total) in per_model.items():
+            out.append({"config": lbl, "model": m, "done": done, "total": total,
+                        "rate": round(100 * done / total, 1) if total else None,
+                        "failed_cases": ", ".join(failed.get(m, [])),
+                        "file": Path(latest[lbl]).name})
+    return out
+
+
+def read_matrix(path):
+    """Doc matrix_asr_*.csv (dang rong) -> (cols, [{model, ky_thuat, <col>: float|None}])."""
+    path = Path(path)
+    if not path.exists():
+        return [], []
+    with open(path, encoding="utf-8") as fh:
+        rd = csv.DictReader(fh)
+        cols = [c for c in (rd.fieldnames or []) if c not in ("model", "ky_thuat")]
+        rows = []
+        for r in rd:
+            row = {"model": r["model"], "ky_thuat": r["ky_thuat"]}
+            for c in cols:
+                v = (r.get(c) or "").strip()
+                row[c] = float(v) if v else None
+            rows.append(row)
+    return cols, rows
+
+
 def print_matrix(title, idx, data, models, groups, cols):
     print(f"\n==== {title} ====")
     for m in models:

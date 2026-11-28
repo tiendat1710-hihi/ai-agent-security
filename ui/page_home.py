@@ -88,9 +88,15 @@ def render(ctx):
                 model=ctx["model"],
                 policy=ctx["policy"],
                 emit=log.emit,
+                run_id=log.run_id,
+                on_pending="pause",
             )
 
-        answer = res["final"] or "(không có câu trả lời / hết bước / bị treo duyệt)"
+        if res.get("status") == "PENDING_APPROVAL":
+            answer = (f"⏸️ Đang chờ duyệt (phiên {res['pending_id']}). "
+                      "Mở tab Hàng đợi duyệt để Approve/Reject; agent sẽ chạy tiếp từ bước đã dừng.")
+        else:
+            answer = res["final"] or "(không có câu trả lời / hết bước)"
         tools_used = [c["tool"] for c in res.get("tool_calls", [])]
         ext = leak_checker.check_external()
 

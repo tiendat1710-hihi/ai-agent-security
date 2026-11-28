@@ -99,6 +99,8 @@ def render(ctx):
                 model=ctx["model"],
                 policy=ctx["policy"],
                 emit=emit,
+                run_id=log.run_id,
+                on_pending="pause",   # L4: dung vong lap, luu checkpoint cho tab HITL
             )
 
         st.markdown("### Diễn biến thực thi (Plan → Act → Observe)")
@@ -110,8 +112,8 @@ def render(ctx):
                     st.error(f"🛡️ Lớp {layer} CHẶN `{ev.get('tool')}` — {reason}")
                 elif d == "PENDING_APPROVAL":
                     st.warning(
-                        f"⏸️ Lớp {layer} TREO DUYỆT `{ev.get('tool')}` — "
-                        f"chờ con người quyết định (xem tab Hàng đợi duyệt)"
+                        f"⏸️ Lớp {layer} TREO DUYỆT `{ev.get('tool')}` — {reason}. "
+                        f"Vòng lặp đã tạm dừng, chờ duyệt ở tab Hàng đợi duyệt"
                     )
             elif e == "tool_call":
                 st.markdown(f"➡️ Gọi công cụ **`{ev.get('tool')}`**")

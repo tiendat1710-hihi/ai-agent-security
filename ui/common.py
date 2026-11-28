@@ -243,7 +243,9 @@ def sidebar():
         if st.button("Reset Lab (Xóa Mail & Tạo lại DB)", use_container_width=True):
             from lab import reset_lab
             reset_lab.reset()
-            for k in ("home_chat", "pending", "attack_steps"):
+            from agent import core
+            core.clear_checkpoints()   # checkpoint cu tro toi hop thu/DB da bi xoa
+            for k in ("home_chat", "pending", "attack_steps", "hitl_last"):
                 st.session_state.pop(k, None)
             st.toast("Đã làm sạch 2 hộp thư và khởi tạo lại company.db", icon="✅")
 

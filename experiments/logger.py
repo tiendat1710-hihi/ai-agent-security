@@ -31,6 +31,8 @@ class RunLogger:
             "reason": reason,
             "latency_ms": round((time.time() - self._t0) * 1000),
         }
+        # truong mo rong (rule, pending_id, reviewer, step...) cho trang Nhat ky kiem toan
+        row.update({k: v for k, v in kwargs.items() if k not in row})
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
         self._t0 = time.time()
@@ -45,7 +47,10 @@ def read_run(run_id_or_path):
     if p.exists():
         for line in p.read_text(encoding="utf-8").splitlines():
             if line.strip():
-                rows.append(json.loads(line))
+                try:   # dong hong (tien trinh bi ngat giua luc ghi) khong lam sap UI
+                    rows.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
     return rows
 
 

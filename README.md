@@ -109,6 +109,18 @@ Chạy screening trên các email trong `attacks/screening/`:
 python -m experiments.bench_models --only attack --models llama3.2:3b
 ```
 
+Đo lại Utility khi có người duyệt Lớp 4 (mô phỏng Approve mọi yêu cầu PENDING_APPROVAL; file ra có tiền tố `utility_hitlok-`):
+
+```powershell
+python -m experiments.bench_baseline --defense all --hitl approve
+```
+
+Thống kê nhật ký kiểm toán (ALLOW / BLOCK / PENDING_APPROVAL theo lớp, quyết định của người duyệt, top lý do):
+
+```powershell
+python -m experiments.audit_summary
+```
+
 Các script benchmark tạo CSV và transcript trong `experiments/results_raw/`. Thư mục kết quả này được Git bỏ qua. Có thể thay tên mô hình bằng mô hình đã tải trong Ollama; xem thêm tùy chọn bằng `--help`.
 
 ## Kiểm tra lab
@@ -122,6 +134,17 @@ Self-test reset lab và cố ý gửi một email chứa marker dữ liệu gi�
 ```powershell
 python -m lab.reset_lab
 ```
+
+## Kiểm thử tự động
+
+Không cần Ollama hay MailHog: LLM và hộp thư được giả lập, cơ sở dữ liệu là `company.db` sinh trong thư mục tạm.
+
+```powershell
+python -m pip install pytest
+python -m pytest
+```
+
+Bộ test gồm policy (SQL authorizer, phân tầng L2/L3/L4), chuẩn hóa tham số tool call, vòng lặp tạm dừng/chạy tiếp, hết hạn duyệt, đọc nhật ký và kết quả, và AppTest cho các trang Hàng đợi duyệt, Nhật ký kiểm toán, Bảng kết quả.
 
 ## Tài liệu
 
