@@ -86,11 +86,23 @@ def list_items(status=None):
             _finish(row, "expired")
         if expired:
             _write_all(rows)
+    for row in expired:
+        _log_expired(row)
     for row in rows:
         saved = row.pop("continuation", None)
         row["can_approve"] = bool(saved and saved.get("layers") is not None)
         row["taint_source"] = saved["state"].get("taint_source") if saved else None
     return [row for row in rows if row["status"] == status] if status else rows
+
+
+def _log_expired(row):
+    """Yeu cau tu het han khi mo hang doi: ghi human_decision de nhat ky kiem toan thay duoc."""
+    if not row.get("run_id"):
+        return
+    from experiments.logger import RunLogger
+    RunLogger(row["model"], run_id=row["run_id"]).emit(
+        "human_decision", tool=row["tool"], decision="EXPIRED", layer=4,
+        reason="het han tu dong, khong ai xu ly", pending_id=row["id"])
 
 
 def _finish(row, status):

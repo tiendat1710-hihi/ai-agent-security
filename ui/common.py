@@ -1,191 +1,137 @@
+from html import escape
+
 import streamlit as st
 import config
 
 
 def inject_custom_css():
-    """CSS phong cach toi gian hien dai (Apple / Linear aesthetic)."""
+    """Shared layout for the lab dashboard."""
     st.markdown(
         """
         <style>
-        /* Font va nen tong the */
-        html, body, [class*="css"] {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", sans-serif;
-            color: #1D1D1F;
-        }
-        .stApp {
-            background-color: #F5F5F7;
-        }
-        header[data-testid="stHeader"] {
-            background: transparent;
-        }
-        #MainMenu, footer, [data-testid="stDecoration"] {
-            visibility: hidden;
-        }
-        .block-container {
-            padding-top: 1.8rem;
-            padding-bottom: 3rem;
-            max-width: 1220px;
-        }
+        .stApp { background: #f1f4f9; }
+        [data-testid="stHeader"] { background: transparent; }
+        #MainMenu, footer, [data-testid="stDecoration"] { visibility: hidden; }
+        .stMainBlockContainer { max-width: 1220px; padding: 2.2rem 2.25rem 3rem; }
+        [data-testid="stSidebar"] { background: #fff; border-right: 1px solid #dbe4ef; }
 
-        /* Sidebar sang gon */
-        section[data-testid="stSidebar"] {
-            background-color: #FFFFFF;
-            border-right: 1px solid rgba(0, 0, 0, 0.07);
-        }
-        section[data-testid="stSidebar"] .block-container {
-            padding-top: 1.5rem;
-        }
-
-        /* Hero Header */
         .hero-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 18px;
-            padding: 22px 28px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             flex-wrap: wrap;
             gap: 14px;
+            background: linear-gradient(112deg, #162641, #243a57 68%, #22555a);
+            border: 1px solid #243650;
+            border-radius: 16px;
+            padding: 23px 27px;
+            margin-bottom: 9px;
+            box-shadow: 0 7px 18px #182b4a1e;
         }
-        .hero-title {
-            font-size: 1.55rem;
+        .hero-card .hero-title {
+            color: #f7faff;
+            font-size: clamp(1.55rem, 3vw, 2.18rem);
+            font-weight: 720;
+            letter-spacing: -0.035em;
+            margin: 0;
+            padding: 0;
+        }
+        .hero-card .hero-sub { color: #dbe6f7; font-size: 0.9rem; margin: 6px 0 0; }
+        .pill-group { display: flex; gap: 7px; flex-wrap: wrap; }
+        .pill { border-radius: 999px; padding: 5px 11px; font-size: 0.79rem; font-weight: 600; }
+        .pill-blue { background: #e5eeff; color: #233e83; }
+        .pill-green { background: #ddf5ed; color: #176252; }
+        .pill-red { background: #fce7ec; color: #9d3050; }
+        .pill-gray { background: #edf1f7; color: #334564; }
+
+        [data-testid="stTabs"] [role="tablist"] {
+            gap: 4px;
+            background: #e6ecf6;
+            border: 1px solid #dbe3f1;
+            border-radius: 11px;
+            padding: 4px;
+            margin-bottom: 8px;
+        }
+        [data-testid="stTabs"] [role="tab"] {
+            border: 0;
+            border-radius: 7px;
+            color: #40516b;
+            padding: 7px 13px;
+        }
+        [data-testid="stTabs"] [role="tab"][aria-selected="true"] {
+            background: #fff;
+            color: #213a73;
+            box-shadow: 0 1px 5px #1a2e4920;
+        }
+        [data-baseweb="tab-highlight"], [data-baseweb="tab-border"] { display: none; }
+
+        .lab-section { border-left: 4px solid #168477; padding: 2px 0 2px 14px; margin: 0 0 7px; }
+        .lab-section h2 {
+            color: #1c304c;
+            font-size: 1.48rem;
             font-weight: 700;
             letter-spacing: -0.025em;
-            color: #1D1D1F;
+            padding: 0;
             margin: 0;
         }
-        .hero-sub {
-            font-size: 0.92rem;
-            color: #6E6E73;
-            margin: 4px 0 0 0;
+        .lab-section p { color: #506079; font-size: 0.9rem; margin: 4px 0 0; }
+        .lab-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(157px, 100%), 1fr));
+            gap: 10px;
+            margin: 0 0 4px;
         }
-
-        /* Pill Badges */
-        .pill-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
-        .pill-blue {
-            background: #E8F2FF;
-            color: #0066CC;
-            border: 1px solid #C2DFFF;
-        }
-        .pill-green {
-            background: #E8F8EE;
-            color: #137333;
-            border: 1px solid #B7E4C7;
-        }
-        .pill-red {
-            background: #FCE8E6;
-            color: #C5221F;
-            border: 1px solid #F6AEA9;
-        }
-        .pill-gray {
-            background: #F2F2F7;
-            color: #3A3A3C;
-            border: 1px solid #E5E5EA;
-        }
-
-        /* Tabs kieu thanh dieu huong hien dai */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 6px;
-            background-color: #E9E9EE;
-            padding: 5px;
+        .lab-metric, .ui-card, [data-testid="stChatMessage"] {
+            border: 1px solid #dce5f1;
             border-radius: 12px;
-            margin-bottom: 16px;
+            background: #fff;
         }
-        .stTabs [data-baseweb="tab"] {
-            border-radius: 9px;
-            padding: 8px 16px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: #515154;
-            border: none;
-            background: transparent;
+        .lab-metric { padding: 12px 15px; min-width: 0; }
+        .lab-metric-label { display: block; font-weight: 650; color: #3e516e; font-size: 0.82rem; }
+        .lab-metric strong { color: #203965; font-size: 1.55rem; line-height: 1.46; font-variant-numeric: tabular-nums; }
+        .lab-metric small { display: block; color: #52637a; font-size: 0.77rem; line-height: 1.4; }
+        .ui-card { padding: 17px 20px; }
+        [data-testid="stChatMessage"] { padding: 12px 16px; }
+        .st-key-audit_filters, .st-key-audit_chart, .st-key-audit_reasons,
+        .st-key-audit_events, .st-key-matrix_action, .st-key-matrix_leak,
+        .st-key-utility_chart, .st-key-utility_detail, [class*="st-key-hitl_request_"] {
+            background: #fff;
+            border-radius: 13px;
         }
-        .stTabs [aria-selected="true"] {
-            background-color: #FFFFFF !important;
-            color: #1D1D1F !important;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        .st-key-audit_reasons [data-testid="stText"],
+        [class*="st-key-hitl_request_"] [data-testid="stText"] {
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
         }
-        .stTabs [data-baseweb="tab-highlight"],
-        .stTabs [data-baseweb="tab-border"] {
-            display: none;
-        }
-
-        /* Card noi dung & Chat */
-        .ui-card {
-            background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 16px;
-            padding: 20px 24px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.025);
-            margin-bottom: 14px;
-        }
-        [data-testid="stChatMessage"] {
-            background-color: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 16px;
-            padding: 14px 18px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-            margin-bottom: 10px;
-        }
-
-        /* Verdict banners */
-        .verdict-box {
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-top: 10px;
-            font-size: 0.88rem;
-            font-weight: 500;
-        }
-        .verdict-safe {
-            background: #E8F8EE;
-            color: #137333;
-            border: 1px solid #B7E4C7;
-        }
-        .verdict-warn {
-            background: #FEF7E0;
-            color: #9A5500;
-            border: 1px solid #FDE293;
-        }
-        .verdict-leak {
-            background: #FCE8E6;
-            color: #C5221F;
-            border: 1px solid #F6AEA9;
-        }
-
-        /* Nut bam bo tron */
-        .stButton > button {
-            border-radius: 10px;
-            font-weight: 500;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            transition: all 0.15s ease;
-        }
-        .stButton > button:hover {
-            border-color: #0071E3;
-            color: #0071E3;
+        .verdict-box { border-radius: 10px; padding: 12px 16px; margin-top: 10px; font-size: 0.89rem; }
+        .verdict-safe { background: #e5f5ee; color: #145f4e; border: 1px solid #bfe5d5; }
+        .verdict-warn { background: #fff3de; color: #824707; border: 1px solid #f1d39e; }
+        .verdict-leak { background: #fce9ed; color: #a22f4c; border: 1px solid #f3bbca; }
+        .stButton > button { border-radius: 8px; font-weight: 600; }
+        @media (max-width: 640px) {
+            .stMainBlockContainer { padding-inline: 1rem; }
+            .hero-card { padding: 19px; }
         }
         </style>
         """,
         unsafe_allow_html=True,
     )
+
+
+def section_header(title, description):
+    st.markdown(
+        f'<header class="lab-section"><h2>{escape(title)}</h2><p>{escape(description)}</p></header>',
+        unsafe_allow_html=True,
+    )
+
+
+def metric_cards(metrics):
+    cards = "".join(
+        f'<div class="lab-metric"><span class="lab-metric-label">{escape(str(label))}</span>'
+        f'<strong>{escape(str(value))}</strong><small>{escape(str(detail))}</small></div>'
+        for label, value, detail in metrics
+    )
+    st.markdown(f'<div class="lab-metrics">{cards}</div>', unsafe_allow_html=True)
 
 
 def build_policy(layers):
@@ -221,9 +167,9 @@ def sidebar():
 
         p1, p2 = st.columns(2)
         with p1:
-            st.button("Tắt hết", use_container_width=True, on_click=_set_all_layers, args=(False,))
+            st.button("Tắt hết", width="stretch", on_click=_set_all_layers, args=(False,))
         with p2:
-            st.button("Bật đủ 4 lớp", use_container_width=True, on_click=_set_all_layers, args=(True,))
+            st.button("Bật đủ 4 lớp", width="stretch", on_click=_set_all_layers, args=(True,))
 
         c1 = st.toggle("Lớp 1 · Lọc HTML ẩn & Spotlighting", key="L1")
         c2 = st.toggle("Lớp 2 · Allowlist & Taint DB", key="L2")
@@ -240,7 +186,7 @@ def sidebar():
 
         st.divider()
         st.markdown("**Môi trường Lab**")
-        if st.button("Reset Lab (Xóa Mail & Tạo lại DB)", use_container_width=True):
+        if st.button("Reset Lab (Xóa Mail & Tạo lại DB)", width="stretch"):
             from lab import reset_lab
             reset_lab.reset()
             for k in ("home_chat", "pending", "attack_steps"):

@@ -1,5 +1,6 @@
 import os
 import sys
+from html import escape
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -30,10 +31,10 @@ st.markdown(
     <div class="hero-card">
         <div>
             <h1 class="hero-title">AI Agent Security Lab</h1>
-            <p class="hero-sub">Mô phỏng Indirect Prompt Injection & Hệ thống phòng thủ đa lớp Guardrails</p>
+            <p class="hero-sub">Thử nghiệm prompt injection gián tiếp và phòng thủ đa lớp trên agent email.</p>
         </div>
         <div class="pill-group">
-            <span class="pill pill-gray">Model: {ctx["model"]}</span>
+            <span class="pill pill-gray">{escape(ctx["model"])}</span>
             {posture_pill}
         </div>
     </div>
