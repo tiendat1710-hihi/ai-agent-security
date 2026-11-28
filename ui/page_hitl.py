@@ -113,6 +113,8 @@ def _approval_message(out):
         message += f" Agent đang chờ duyệt yêu cầu tiếp theo {result['pending_id']}."
     elif result["status"] == "max_steps":
         message += " Agent hết số bước trước khi trả lời."
+    elif result["status"] == "output_truncated":
+        message += " Phần tiếp tục dừng vì model chạm giới hạn đầu ra."
     elif result["status"] == "infra_error":
         message += f" Phần tiếp tục gặp lỗi: {result['error']}"
     elif result["final"]:

@@ -93,6 +93,8 @@ def render(ctx):
 
         if res["status"] == "pending":
             answer = f"Đang chờ duyệt yêu cầu {res['pending_id']} trong tab Hàng đợi duyệt."
+        elif res["status"] == "output_truncated":
+            answer = "Model chạm giới hạn đầu ra. Lượt chạy dừng trước khi xử lý phản hồi bị cắt."
         else:
             answer = res["final"] or "Agent hết số bước trước khi đưa ra câu trả lời."
         tools_used = [c["tool"] for c in res.get("tool_calls", [])]

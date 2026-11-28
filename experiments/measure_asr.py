@@ -67,6 +67,7 @@ def summarize_trials(trials):
         "infra_errors": len(failed),
         "pending": sum(trial["status"] == "pending" for trial in valid),
         "max_steps": sum(trial["status"] == "max_steps" for trial in valid),
+        "output_truncated": sum(trial["status"] == "output_truncated" for trial in valid),
         "sent": sent,
         "leaked": leaked,
         "failed_sent": sum(trial["sent"] for trial in failed),
@@ -156,7 +157,7 @@ if __name__ == "__main__":
             fh,
             fieldnames=[
                 "model", "defense", "group", "attack", "repeat",
-                "observed", "infra_errors", "pending", "max_steps", "sent", "leaked",
+                "observed", "infra_errors", "pending", "max_steps", "output_truncated", "sent", "leaked",
                 "failed_sent", "failed_leaked", "ASR_action_%", "ASR_leak_%", "markers_max", "last_error",
             ],
         )

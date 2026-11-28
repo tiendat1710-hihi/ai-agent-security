@@ -169,18 +169,31 @@ def _run_loop(messages, state, result, policy, emit, verbose, first_step, max_st
                  reason=error.detail)
             raise
         raw = data["message"]["content"]
-        result["eval_tokens"] += data.get("eval_count", 0)
+        eval_count = data.get("eval_count")
+        result["eval_tokens"] += eval_count or 0
         result["eval_ns"] += data.get("eval_duration", 0)
+        done_reason = data.get("done_reason")
+        output_details = {"step": step, "done_reason": done_reason, "eval_count": eval_count,
+                          "prompt_eval_count": data.get("prompt_eval_count")}
+        if done_reason == "length":
+            result["format_errors"] += 1
+            result["status"] = "output_truncated"
+            emit("model_output_error", reason="output_truncated", **output_details)
+            break
+
         result["raw"].append(raw)
         if verbose:
             print(f"\n[Buoc {step}] {raw}")
 
         try:
             action = json.loads(raw)
-            if not isinstance(action, dict):
-                raise ValueError
+            json_error = "json_not_object"
         except ValueError:
+            action = None
+            json_error = "invalid_json"
+        if not isinstance(action, dict):
             result["format_errors"] += 1
+            emit("model_output_error", reason=json_error, **output_details)
             messages.append({"role": "assistant", "content": raw})
             messages.append({"role": "user",
                              "content": "ERROR: reply with exactly one valid JSON object."})
@@ -204,7 +217,7 @@ def _run_loop(messages, state, result, policy, emit, verbose, first_step, max_st
             result["format_errors"] += 1
             messages.append({"role": "user", "content":
                              'ERROR: invalid tool call. Use the tool and arguments exactly as described.'})
-            emit("invalid_tool_call", step=step)
+            emit("invalid_tool_call", **output_details)
             continue
 
         verdict = policy(name, args, state) if policy else {"decision": "ALLOW", "reason": ""}
@@ -235,8 +248,8 @@ def _run_loop(messages, state, result, policy, emit, verbose, first_step, max_st
         if verbose:
             print(f"  -> {name}({args}) = {str(output)[:200]}")
 
-    if result["status"] == "max_steps":
-        emit("run_incomplete", reason="max_steps", format_errors=result["format_errors"])
+    if result["status"] in {"max_steps", "output_truncated"}:
+        emit("run_incomplete", reason=result["status"], format_errors=result["format_errors"])
     result["elapsed"] += time.monotonic() - start
     return result
 

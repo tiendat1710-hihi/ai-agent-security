@@ -166,6 +166,8 @@ def render(ctx):
         elif res["status"] == "max_steps":
             st.warning(f"Agent hết số bước, có {res['format_errors']} lỗi định dạng. "
                        "Hộp thư ngoài đang trống. Lượt chạy chưa hoàn tất.")
+        elif res["status"] == "output_truncated":
+            st.warning("Model chạm giới hạn đầu ra. Lượt chạy chưa hoàn tất. Hộp thư ngoài đang trống.")
         elif res["status"] == "infra_error":
             st.warning("Chưa thể kết luận về lượt chạy. Hộp thư ngoài đang trống.")
         else:
